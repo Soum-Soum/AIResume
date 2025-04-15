@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        {
+            "name": "run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "fastapi",
+            "args": [
+                "run",
+                "src/app.py",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9093",
+            ],
+            "jinja": true
+        },
+        {
+            "name": "dev",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "fastapi",
+            "args": [
+                "dev",
+                "src/app.py",
+                "--reload",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9093",
+            ],
+            "jinja": true
+        }
+    ]
+}

@@ -31,7 +31,3 @@ class Resume(BaseModel):
     experiences: list[Experience]
     educations: list[Education]
     skills: list[Skill]
-
-
-class ResumeExt(Resume):
-    file_hash: str

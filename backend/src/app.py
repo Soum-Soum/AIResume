@@ -3,13 +3,13 @@ from loguru import logger
 from openai import OpenAI
 
 from src.config import settings
-from src.db import find_resume_by_hash, insert_new_resume, create_tables
+from src.db import find_resume_by_hash, insert_new_resume
 from src.guided_gen import Resume
 from src.models import ResumeModel
 from src.utils.image_utils import file_to_image, to_base64
 from src.utils.utils import file_to_sha256
 
-app = FastAPI(on_startup=[create_tables])
+app = FastAPI()
 
 
 @app.get("/health/")
@@ -61,10 +61,6 @@ async def resume_analyse(files: list[UploadFile] = File(...)) -> dict[str, str]:
 
     resume_data = Resume.model_validate_json(completion.choices[0].message.content)
 
-    resume_model = ResumeModel(
-        **resume_data.model_dump(),
-        file_hash=file_hash,
-    )
-
-    insert_new_resume(resume_model)
+    insert_new_resume(resume_data=resume_data, file_hash=file_hash)
+    logger.info(f"Resume inserted in the database with hash: {file_hash}")
     return {"status": "ok"}

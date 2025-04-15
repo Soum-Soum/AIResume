@@ -2,7 +2,9 @@ import uuid
 from datetime import datetime
 from typing import Optional, List
 
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, create_engine
+
+from src.config import settings
 
 
 class ExperienceModel(SQLModel, table=True):
@@ -59,3 +61,8 @@ class ResumeModel(SQLModel, table=True):
     experiences: List[ExperienceModel] = Relationship(back_populates="parent_resume")
     educations: List[EducationModel] = Relationship(back_populates="parent_resume")
     skills: List[SkillModel] = Relationship(back_populates="parent_resume")
+
+
+database_url = settings.DATABASE_URL
+engine = create_engine(database_url, echo=False)
+SQLModel.metadata.create_all(engine)
