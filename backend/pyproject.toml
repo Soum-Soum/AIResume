@@ -1,0 +1,15 @@
+[project]
+name = "resume-analyser"
+version = "0.1.0"
+description = "Insert description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dynaconf>=3.2.10",
+    "fastapi>=0.115.12",
+    "litellm>=1.66.1",
+    "loguru>=0.7.3",
+    "pillow>=11.2.1",
+    "pydantic>=2.11.3",
+    "sqlmodel>=0.0.24",
+]
