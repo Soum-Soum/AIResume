@@ -7,11 +7,13 @@ class WithDates(BaseModel):
     start_date: str
     end_date: str
 
+
 class Experience(WithDates):
     title: str
     company: str
     location: str
     description: str
+
 
 class Education(WithDates):
     institution: str
@@ -19,9 +21,11 @@ class Education(WithDates):
     field_of_study: str
     description: str
 
+
 class Skill(BaseModel):
     name: str
     level: Literal["beginner", "intermediate", "advanced", "expert"]
+
 
 class Resume(BaseModel):
     name: str

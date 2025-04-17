@@ -2,9 +2,9 @@ import uuid
 from datetime import datetime
 from typing import Optional, List
 
-from sqlmodel import SQLModel, Field, Relationship, create_engine
+from sqlmodel import SQLModel, Field, Relationship, create_engine, Session
 
-from src.config import settings
+from config import settings
 
 
 class ExperienceModel(SQLModel, table=True):
@@ -48,21 +48,42 @@ class SkillModel(SQLModel, table=True):
     parent_resume: "ResumeModel" = Relationship(back_populates="skills")
 
 
-class ResumeModel(SQLModel, table=True):
-    __tablename__ = "resumemodel"
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+class ResumeModelBase(SQLModel):
     file_hash: str
     name: str
     email: str
     phone: str
     summary: Optional[str] = None
 
+
+class ResumeModel(ResumeModelBase, table=True):
+    __tablename__ = "resumemodel"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
     experiences: List[ExperienceModel] = Relationship(back_populates="parent_resume")
     educations: List[EducationModel] = Relationship(back_populates="parent_resume")
     skills: List[SkillModel] = Relationship(back_populates="parent_resume")
 
 
+class ResumeModelPublic(ResumeModelBase):
+    id: uuid.UUID
+
+
+class ResumeModelPublicWithDetails(ResumeModelPublic):
+    experiences: List[ExperienceModel] = []
+    educations: List[EducationModel] = []
+    skills: List[SkillModel] = []
+
+
 database_url = settings.DATABASE_URL
 engine = create_engine(database_url, echo=False)
-SQLModel.metadata.create_all(engine)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session

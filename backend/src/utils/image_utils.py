@@ -12,6 +12,7 @@ def to_base64(image: PILImage) -> str:
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
+
 async def file_to_image(file: UploadFile) -> PILImage:
     await file.seek(0)
     return Image.open(io.BytesIO(await file.read()))

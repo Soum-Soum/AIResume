@@ -1,13 +1,22 @@
-from fastapi import FastAPI, UploadFile, File
+import uuid
+from typing import Sequence
+
+from fastapi import FastAPI, UploadFile, File, Depends, HTTPException
 from loguru import logger
 from openai import OpenAI
 
-from src.config import settings
-from src.db import find_resume_by_hash, insert_new_resume
-from src.guided_gen import Resume
-from src.models import ResumeModel
-from src.utils.image_utils import file_to_image, to_base64
-from src.utils.utils import file_to_sha256
+from config import settings
+from db import find_resume_by_hash, insert_new_resume
+from guided_gen import Resume
+from models import (
+    get_session,
+    ResumeModelPublicWithDetails,
+    ResumeModel,
+    ResumeModelPublic,
+)
+from utils.image_utils import file_to_image, to_base64
+from utils.utils import file_to_sha256
+from sqlmodel import Session, select
 
 app = FastAPI()
 
@@ -64,3 +73,19 @@ async def resume_analyse(files: list[UploadFile] = File(...)) -> dict[str, str]:
     insert_new_resume(resume_data=resume_data, file_hash=file_hash)
     logger.info(f"Resume inserted in the database with hash: {file_hash}")
     return {"status": "ok"}
+
+
+@app.get("/resume/details/{resume_uuid}", response_model=ResumeModelPublicWithDetails)
+def read_resume(*, resume_uuid: uuid.UUID, session: Session = Depends(get_session)):
+    resume = session.get(ResumeModel, resume_uuid)
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    return resume
+
+
+@app.get("/resume/list", response_model=list[ResumeModelPublic])
+def list_resumes(
+    session: Session = Depends(get_session),
+    limit: int = 10,
+):
+    return session.exec(select(ResumeModel).limit(limit)).all()

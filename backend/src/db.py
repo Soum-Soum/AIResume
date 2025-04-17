@@ -1,10 +1,10 @@
 from typing import Optional, Sequence
 
 from sqlmodel import Session, select
-from src.config import settings
-from src.guided_gen import Resume
-from src.models import EducationModel, ExperienceModel, ResumeModel, SkillModel, engine
-from src.utils.utils import parse_date
+
+from guided_gen import Resume
+from models import EducationModel, ExperienceModel, ResumeModel, SkillModel, engine
+from utils.utils import parse_date
 
 
 def find_resume_by_id(resume_id: str) -> Optional[ResumeModel]:
@@ -57,7 +57,6 @@ def insert_new_resume(resume_data: Resume, file_hash: str) -> None:
 
 def list_resumes(n: int = 10) -> Sequence[ResumeModel]:
     with Session(engine) as session:
-
         statement = select(ResumeModel).limit(n)
         result = session.exec(statement).scalars().all()
         return result
