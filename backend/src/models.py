@@ -6,12 +6,7 @@ from sqlmodel import SQLModel, Field, Relationship, create_engine, Session
 
 from config import settings
 
-
-class ExperienceModel(SQLModel, table=True):
-    __tablename__ = "experiencemodel"
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    resume_id: uuid.UUID = Field(foreign_key="resumemodel.id")
+class ExperienceModelBase(SQLModel):
     title: str
     company: str
     location: str
@@ -19,14 +14,17 @@ class ExperienceModel(SQLModel, table=True):
     end_date: Optional[datetime] = None
     description: Optional[str] = None
 
-    parent_resume: "ResumeModel" = Relationship(back_populates="experiences")
+class ExperienceModelPublic(ExperienceModelBase):
+    id: uuid.UUID
 
-
-class EducationModel(SQLModel, table=True):
-    __tablename__ = "educationmodel"
+class ExperienceModel(ExperienceModelBase, table=True):
+    __tablename__ = "experiencemodel"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     resume_id: uuid.UUID = Field(foreign_key="resumemodel.id")
+    parent_resume: "ResumeModel" = Relationship(back_populates="experiences")
+
+class EducationModelBase(SQLModel):
     institution: str
     degree: str
     field_of_study: str
@@ -34,22 +32,34 @@ class EducationModel(SQLModel, table=True):
     end_date: Optional[datetime] = None
     description: Optional[str] = None
 
+class EducationModelPublic(EducationModelBase):
+    id: uuid.UUID
+
+class EducationModel(EducationModelBase, table=True):
+    __tablename__ = "educationmodel"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    resume_id: uuid.UUID = Field(foreign_key="resumemodel.id")
+
     parent_resume: "ResumeModel" = Relationship(back_populates="educations")
 
+class SkillModelBase(SQLModel):
+    name: str
+    level: str
 
-class SkillModel(SQLModel, table=True):
+class SkillModelPublic(SkillModelBase):
+    id: uuid.UUID
+
+class SkillModel(SkillModelBase, table=True):
     __tablename__ = "skillmodel"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     resume_id: uuid.UUID = Field(foreign_key="resumemodel.id")
-    name: str
-    level: str
 
     parent_resume: "ResumeModel" = Relationship(back_populates="skills")
 
 
 class ResumeModelBase(SQLModel):
-    file_hash: str
     name: str
     email: str
     phone: str
@@ -60,6 +70,7 @@ class ResumeModel(ResumeModelBase, table=True):
     __tablename__ = "resumemodel"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    file_hash: str
 
     experiences: List[ExperienceModel] = Relationship(back_populates="parent_resume")
     educations: List[EducationModel] = Relationship(back_populates="parent_resume")
@@ -71,9 +82,9 @@ class ResumeModelPublic(ResumeModelBase):
 
 
 class ResumeModelPublicWithDetails(ResumeModelPublic):
-    experiences: List[ExperienceModel] = []
-    educations: List[EducationModel] = []
-    skills: List[SkillModel] = []
+    experiences: List[ExperienceModelPublic] = []
+    educations: List[EducationModelPublic] = []
+    skills: List[SkillModelPublic] = []
 
 
 database_url = settings.DATABASE_URL

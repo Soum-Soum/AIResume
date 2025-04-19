@@ -1,9 +1,10 @@
 import uuid
-from typing import Sequence
 
 from fastapi import FastAPI, UploadFile, File, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
-from openai import OpenAI
+from sqlmodel import Session, select
+from litellm import acompletion
 
 from config import settings
 from db import find_resume_by_hash, insert_new_resume
@@ -16,10 +17,16 @@ from models import (
 )
 from utils.image_utils import file_to_image, to_base64
 from utils.utils import file_to_sha256
-from sqlmodel import Session, select
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Ou ["http://localhost:5173"] pour plus de sécurité
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health/")
 async def health_check() -> dict:
@@ -45,7 +52,8 @@ async def resume_analyse(files: list[UploadFile] = File(...)) -> dict[str, str]:
 
     image = await file_to_image(file)
 
-    completion = OpenAI(api_key=settings.OPENAI_API_KEY).beta.chat.completions.parse(
+    completion = await acompletion(
+        api_key=settings.OPENAI_API_KEY,
         model=settings.OPENAI_MODEL,
         messages=[
             {"role": "system", "content": "You are a resume analysis bot."},
@@ -76,7 +84,7 @@ async def resume_analyse(files: list[UploadFile] = File(...)) -> dict[str, str]:
 
 
 @app.get("/resume/details/{resume_uuid}", response_model=ResumeModelPublicWithDetails)
-def read_resume(*, resume_uuid: uuid.UUID, session: Session = Depends(get_session)):
+async def read_resume(*, resume_uuid: uuid.UUID, session: Session = Depends(get_session)):
     resume = session.get(ResumeModel, resume_uuid)
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
@@ -84,7 +92,7 @@ def read_resume(*, resume_uuid: uuid.UUID, session: Session = Depends(get_sessio
 
 
 @app.get("/resume/list", response_model=list[ResumeModelPublic])
-def list_resumes(
+async def list_resumes(
     session: Session = Depends(get_session),
     limit: int = 10,
 ):

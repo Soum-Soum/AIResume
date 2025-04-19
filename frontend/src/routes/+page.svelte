@@ -1,2 +1,10 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+    import { QueryClientProvider } from '@tanstack/svelte-query';
+    import { queryClient } from "$lib/query-client";
+    import Page from "../components/Page.svelte";
+</script>
+
+<QueryClientProvider client={queryClient}>
+    <Page></Page>
+</QueryClientProvider>
+
