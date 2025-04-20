@@ -3,6 +3,12 @@
     import { resumeApi} from "../../api/client";
     import SideBarTile from "./SideBarTile.svelte";
 
+	let { selectedResumeId = $bindable() } = $props();
+
+    function handleClick(resumeId: string) {
+        selectedResumeId = resumeId;
+    }
+
     const resumeListQuery = createQuery({
         queryKey: ['resume.list'],
         queryFn: resumeApi.getResumes,
@@ -17,12 +23,9 @@
         <p>Error: {$resumeListQuery.error.message}</p>
     {:else if $resumeListQuery.isSuccess}
         {#each $resumeListQuery.data as resume (resume.id)}
-            <SideBarTile
-                id={resume.id}
-                name={resume.name}
-                phoneNumber={resume.phone}
-                email={resume.email}
-            />
+            <div onclick={() => handleClick(resume.id)} class="cursor-pointer">
+                <SideBarTile resume={resume}/>
+            </div>
         {/each}
     {:else}
         <p>Unknown state</p>
