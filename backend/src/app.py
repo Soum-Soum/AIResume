@@ -48,7 +48,7 @@ async def resume_analyse(files: list[UploadFile] = File(...)) -> dict[str, str]:
         "image/png",
         "image/jpg",
         "image/webp",
-    ], f"Only image files are supported for now"
+    ], f"Only image files are supported for now but got {file.content_type}"
 
     image = await file_to_image(file)
 
