@@ -2,8 +2,15 @@ from typing import Optional, Sequence
 
 from sqlmodel import Session, select
 
-from guided_gen import Resume
-from models import EducationModel, ExperienceModel, ResumeModel, SkillModel, engine
+from db.models import (
+    ResumeModel,
+    engine,
+    ExperienceModel,
+    EducationModel,
+    SkillModel,
+    File,
+)
+from llm.kie.guided_gen import Resume
 from utils.utils import parse_date
 
 
@@ -16,7 +23,7 @@ def find_resume_by_id(resume_id: str) -> Optional[ResumeModel]:
 
 def find_resume_by_hash(file_hash: str) -> Optional[ResumeModel]:
     with Session(engine) as session:
-        statement = select(ResumeModel).where(ResumeModel.file_hash == file_hash)
+        statement = select(File).where(File.file_hash == file_hash)
         result = session.exec(statement).first()
         return result
 
@@ -26,6 +33,7 @@ def insert_new_resume(resume_data: Resume, file_hash: str) -> None:
         experiences = [
             ExperienceModel(
                 **exp.model_dump(exclude={"start_date", "end_date"}),
+                summary=str(exp),
                 start_date=parse_date(exp.start_date),
                 end_date=parse_date(exp.end_date),
             )
@@ -35,6 +43,7 @@ def insert_new_resume(resume_data: Resume, file_hash: str) -> None:
         educations = [
             EducationModel(
                 **edu.model_dump(exclude={"start_date", "end_date"}),
+                summary=str(edu),
                 start_date=parse_date(edu.start_date),
                 end_date=parse_date(edu.end_date),
             )

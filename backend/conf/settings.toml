@@ -1,3 +1,5 @@
 [default]
 OPENAI_MODEL="gpt-4o-mini"
+OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
 DATABASE_URL="sqlite:///resume_analyser.db"
+VECTORIAL_DB_URL="http://localhost:6333"

@@ -28,10 +28,10 @@
     <div class="bg-white shadow-lg rounded-3xl p-8 border border-gray-100
                 transition-all duration-300 hover:shadow-xl max-w-4xl mx-auto">
 
-        <!-- Informations générales -->
+        <!-- General Information -->
         <ResumeGeneralInfo resume={$resumeDetailQuery.data}/>
 
-        <!-- Section Expérience -->
+        <!-- Experiances -->
         <div class="mb-8">
             <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <span class="mr-2 text-blue-600">💼</span>Expérience professionnelle
@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <!-- Section Éducation -->
+        <!-- Éducations -->
         <div class="mb-8">
             <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <span class="mr-2 text-blue-600">🎓</span>Formation
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <!-- Section Compétences -->
+        <!-- Skills -->
         <div>
             <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <span class="mr-2 text-blue-600">🔧</span>Compétences
@@ -72,5 +72,5 @@
 {/if}
 
 <style lang="postcss">
-    /* Les styles sont maintenant intégrés directement dans les classes Tailwind */
+
 </style>
