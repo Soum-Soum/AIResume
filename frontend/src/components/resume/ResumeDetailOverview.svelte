@@ -14,22 +14,28 @@
             enabled: !!resumeId
         })
     );
-
 </script>
+
 {#if $resumeDetailQuery.isLoading}
-    <p>Loading...</p>
+    <div class="flex justify-center items-center min-h-32">
+        <div class="animate-pulse text-blue-600">Chargement...</div>
+    </div>
 {:else if $resumeDetailQuery.isError}
-    <p>Error: {$resumeDetailQuery.error.message}</p>
+    <div class="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200">
+        <p>Erreur: {$resumeDetailQuery.error.message}</p>
+    </div>
 {:else if $resumeDetailQuery.isSuccess}
-    <div class="bg-white shadow-md rounded-2xl p-6 border border-gray-100
-                transition-all duration-300 transform hover:shadow-xl">
+    <div class="bg-white shadow-lg rounded-3xl p-8 border border-gray-100
+                transition-all duration-300 hover:shadow-xl max-w-4xl mx-auto">
 
         <!-- Informations générales -->
         <ResumeGeneralInfo resume={$resumeDetailQuery.data}/>
 
         <!-- Section Expérience -->
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Expérience professionnelle</h3>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <span class="mr-2 text-blue-600">💼</span>Expérience professionnelle
+            </h3>
             <div class="space-y-4">
                 {#each $resumeDetailQuery.data.experiences as exp (exp.id)}
                     <ExperienceItem {exp}/>
@@ -38,8 +44,10 @@
         </div>
 
         <!-- Section Éducation -->
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Formation</h3>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <span class="mr-2 text-blue-600">🎓</span>Formation
+            </h3>
             <div class="space-y-4">
                 {#each $resumeDetailQuery.data.educations as education (education.id)}
                     <EducationItem {education}/>
@@ -49,8 +57,10 @@
 
         <!-- Section Compétences -->
         <div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Compétences</h3>
-            <div class="flex flex-wrap gap-2">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <span class="mr-2 text-blue-600">🔧</span>Compétences
+            </h3>
+            <div class="flex flex-wrap gap-3">
                 {#each $resumeDetailQuery.data.skills as skill (skill.id)}
                     <SkillItem {skill}/>
                 {/each}
@@ -58,10 +68,9 @@
         </div>
     </div>
 {:else}
-    <p>Unknown state</p>
+    <p class="text-gray-700 italic">État inconnu</p>
 {/if}
 
-
 <style lang="postcss">
-    /* Styles supplémentaires si nécessaire */
+    /* Les styles sont maintenant intégrés directement dans les classes Tailwind */
 </style>
